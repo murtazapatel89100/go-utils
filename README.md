@@ -31,21 +31,19 @@ Each utility is modular, isolated, and versioned, allowing selective usage witho
 
 ## Current Structure
 
-``` bash
+```
 go-utils/
 ├── cmd/                # CLI applications
 │   ├── create-env/     # CLI to generate .env from env.template
-│   ├── setup-env/      # CLI to generate pipeline .env from env.test
-│   └── jsonfmt/        # CLI to format and validate JSON files
+│   └── setup-env/      # CLI to generate pipeline .env from env.test
 │
 ├── pkg/                # Reusable Go packages
-│   ├── envutils/       # Environment file helpers
-│   │   ├── copy.go
-│   │   └── replace.go
-│   └── formatter/      # JSON formatting utilities
+│   └── envutils/       # Environment file helpers
+│       ├── copy.go
+│       └── replace.go
 │
+├── dist/               # Built binaries for releases
 ├── go.mod
-├── .gitignore
 └── README.md
 ```
 
@@ -86,23 +84,6 @@ Key features:
 
 ---
 
-### 3. jsonfmt
-
-A CLI tool for formatting and validating JSON files.
-
-Primary use case:
-
-- Format and validate JSON files with consistent indentation
-- Quick JSON validation in development and CI/CD pipelines
-
-Key features:
-
-- Pretty-print JSON with configurable indentation
-- Validate JSON syntax
-- Output formatted JSON or validation results
-
----
-
 ## Reusable Package: envutils
 
 The `envutils` package provides reusable logic used by the CLI tools and other Go projects.
@@ -129,7 +110,7 @@ import "github.com/murtazapatel89100/go-utils/pkg/envutils"
 
 Download binaries from GitHub Releases and run directly:
 
-```bash
+``` go
 ./create-env
 ./setup-env <project-directory>
 ```
@@ -138,7 +119,7 @@ Download binaries from GitHub Releases and run directly:
 
 Add to your project:
 
-```bash
+``` go
 go get github.com/murtazapatel89100/go-utils
 ```
 
