@@ -35,15 +35,20 @@ Each utility is modular, isolated, and versioned, allowing selective usage witho
 go-utils/
 ├── cmd/                # CLI applications
 │   ├── create-env/     # CLI to generate .env from env.template
-│   └── setup-env/      # CLI to generate pipeline .env from env.test
+│   ├── setup-env/      # CLI to generate pipeline .env from env.test
+│   └── jsonfmt/        # CLI to format and validate JSON files
 │
 ├── pkg/                # Reusable Go packages
-│   └── envutils/       # Environment file helpers
-│       ├── copy.go
-│       └── replace.go
+│   ├── envutils/       # Environment file helpers
+│   │   ├── copy.go
+│   │   └── replace.go
+│   └── formatter/      # JSON formatting utilities
+│       └── formatter.go
 │
-├── dist/               # Built binaries for releases
+├── dist/               # Built binaries for releases (in .gitignore)
+├── .gitignore
 ├── go.mod
+├── LICENSE
 └── README.md
 ```
 
@@ -84,6 +89,24 @@ Key features:
 
 ---
 
+### 3. jsonfmt
+
+A CLI tool for formatting and validating JSON files.
+
+Primary use case:
+
+- Format and validate JSON files with consistent indentation
+- Quick JSON validation in development and CI/CD pipelines
+
+Key features:
+
+- Pretty-print JSON with 2-space indentation
+- Validate JSON syntax
+- Fast and minimal dependencies
+- Cross-platform (Linux, macOS, Windows)
+
+---
+
 ## Reusable Package: envutils
 
 The `envutils` package provides reusable logic used by the CLI tools and other Go projects.
@@ -104,22 +127,40 @@ import "github.com/murtazapatel89100/go-utils/pkg/envutils"
 
 ---
 
+## Reusable Package: formatter
+
+The `formatter` package provides JSON formatting utilities used by jsonfmt and other Go projects.
+
+Available functions:
+
+- `FormatJSON(input []byte) ([]byte, error)`
+  Formats JSON input with consistent 2-space indentation and returns formatted output or error.
+
+This package can be imported into any Go project:
+
+```go
+import "github.com/murtazapatel89100/go-utils/pkg/formatter"
+```
+
+---
+
 ## Usage Modes
 
 ### As CLI Tools
 
 Download binaries from GitHub Releases and run directly:
 
-``` go
+```bash
 ./create-env
 ./setup-env <project-directory>
+./jsonfmt input.json
 ```
 
 ### As Go Packages
 
 Add to your project:
 
-``` go
+```bash
 go get github.com/murtazapatel89100/go-utils
 ```
 
