@@ -36,16 +36,21 @@ go-utils/
 ├── cmd/                # CLI applications
 │   ├── create-env/     # CLI to generate .env from env.template
 │   ├── setup-env/      # CLI to generate pipeline .env from env.test
-│   └── jsonfmt/        # CLI to format and validate JSON files
+│   ├── jsonfmt/        # CLI to format and validate JSON files
+│   └── prettier/       # CLI to initialize and configure Prettier
 │
 ├── pkg/                # Reusable Go packages
 │   ├── envutils/       # Environment file helpers
 │   │   ├── copy.go
 │   │   └── replace.go
-│   └── formatter/      # JSON formatting utilities
-│       └── formatter.go
+│   ├── formatter/      # JSON formatting utilities
+│   │   └── formatter.go
+│   └── prettier/       # Prettier configuration generation
+│       └── generator.go
 │
 ├── dist/               # Built binaries for releases (in .gitignore)
+├── .github/            # GitHub-specific files
+│   └── copilot.md      # Development guidelines
 ├── .gitignore
 ├── go.mod
 ├── LICENSE
@@ -107,6 +112,24 @@ Key features:
 
 ---
 
+### 4. prettier
+
+A CLI tool to initialize and configure Prettier for code formatting projects.
+
+Primary use case:
+
+- Quick setup of Prettier configuration in new projects
+- Automated Prettier installation and `.prettierrc` generation
+
+Key features:
+
+- Support for multiple package managers (npm, pnpm)
+- Generates standard `.prettierrc` configuration
+- Configurable indentation and formatting rules
+- Cross-platform (Linux, macOS, Windows)
+
+---
+
 ## Reusable Package: envutils
 
 The `envutils` package provides reusable logic used by the CLI tools and other Go projects.
@@ -144,6 +167,23 @@ import "github.com/murtazapatel89100/go-utils/pkg/formatter"
 
 ---
 
+## Reusable Package: prettier
+
+The `prettier` package provides utilities for generating Prettier configuration files.
+
+Available functions:
+
+- `GeneratePrettierConfig() error`
+  Generates a `.prettierrc` configuration file with standard formatting rules.
+
+This package can be imported into any Go project:
+
+```go
+import "github.com/murtazapatel89100/go-utils/pkg/prettier"
+```
+
+---
+
 ## Usage Modes
 
 ### As CLI Tools
@@ -154,6 +194,7 @@ Download binaries from GitHub Releases and run directly:
 ./create-env
 ./setup-env <project-directory>
 ./jsonfmt input.json
+./prettier -pkg npm
 ```
 
 ### As Go Packages
