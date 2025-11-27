@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/murtazapatel89100/go-utils/pkg/prettier"
 )
 
 func main() {
@@ -12,6 +14,11 @@ func main() {
 	flag.Parse()
 
 	fmt.Println("Generating .prettierrc...")
+
+	if err := prettier.GeneratePrettierConfig(); err != nil {
+		fmt.Println("Failed to generate .prettierrc:", err)
+		os.Exit(1)
+	}
 
 	var cmd *exec.Cmd
 
