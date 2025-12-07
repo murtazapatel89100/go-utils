@@ -1,0 +1,103 @@
+name: Build binaries
+
+# Trigger manually, on pull requests and on pushes to main
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+  actions: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-amd64
+            runs_on: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            ext: ""
+          - name: linux-arm64
+            runs_on: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            ext: ""
+          - name: darwin-amd64
+            runs_on: macos-latest
+            goos: darwin
+            goarch: amd64
+            ext: ""
+          - name: darwin-arm64
+            runs_on: macos-latest
+            goos: darwin
+            goarch: arm64
+            ext: ""
+          - name: windows-amd64
+            runs_on: windows-latest
+            goos: windows
+            goarch: amd64
+            ext: ".exe"
+
+    runs-on: ${{ matrix.runs_on }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.cache/gocache
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Show environment
+        run: |
+          echo "Matrix: ${{ matrix.name }}"
+          go version
+          go env
+
+      - name: Build all cmd/* binaries
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          EXT: ${{ matrix.ext }}
+        run: |
+          set -e
+          mkdir -p dist
+          # Build each folder in cmd/
+          for d in cmd/* ; do
+            if [ -d "$d" ]; then
+              name=$(basename "$d")
+              echo "Building $name for $GOOS/$GOARCH"
+              # output name: <tool>-<goos>-<goarch><ext>
+              out="dist/${name}-${GOOS}-${GOARCH}${EXT}"
+              # use explicit env for go build so it's portable on macOS/Windows runners
+              GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="-s -w" -o "${out}" "./cmd/${name}"
+              echo " -> ${out}"
+            fi
+          done
+          ls -la dist || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.name }}
+          path: dist/*
+          retention-days: 7

@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build binaries for release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-amd64
+            runs_on: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            ext: ""
+          - name: linux-arm64
+            runs_on: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            ext: ""
+          - name: darwin-amd64
+            runs_on: macos-latest
+            goos: darwin
+            goarch: amd64
+            ext: ""
+          - name: darwin-arm64
+            runs_on: macos-latest
+            goos: darwin
+            goarch: arm64
+            ext: ""
+          - name: windows-amd64
+            runs_on: windows-latest
+            goos: windows
+            goarch: amd64
+            ext: ".exe"
+
+    runs-on: ${{ matrix.runs_on }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Build all tools
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          EXT: ${{ matrix.ext }}
+        run: |
+          set -e
+          mkdir -p dist
+          for d in cmd/*; do
+            if [ -d "$d" ]; then
+              tool=$(basename "$d")
+              outfile="dist/${tool}-${GOOS}-${GOARCH}${EXT}"
+              echo "Building $tool -> $outfile"
+              GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="-s -w" -o "$outfile" "./cmd/${tool}"
+            fi
+          done
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-binaries
+          path: dist/*
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-dist
+
+      - name: Display files
+        run: ls -R release-dist
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-dist/**/*
+          generate_release_notes: true

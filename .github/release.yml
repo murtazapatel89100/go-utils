@@ -1,0 +1,30 @@
+changelog:
+  categories:
+    - title: Added
+      labels:
+        - "feature"
+        - "enhancement"
+        - "add"
+        - "added"
+
+    - title: Changed
+      labels:
+        - "change"
+        - "updated"
+        - "refactor"
+        - "improvement"
+
+    - title: Fixed
+      labels:
+        - "bug"
+        - "fix"
+        - "bugfix"
+        - "fixed"
+
+    - title: Security
+      labels:
+        - "security"
+
+    - title: Other
+      labels:
+        - "*"
