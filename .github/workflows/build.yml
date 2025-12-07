@@ -74,6 +74,7 @@ jobs:
           go env
 
       - name: Build all cmd/* binaries
+        shell: bash
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
