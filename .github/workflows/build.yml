@@ -1,6 +1,6 @@
+run-name: Build binaries for release
 name: Build binaries
 
-# Trigger manually, on pull requests and on pushes to main
 on:
   push:
     branches: ["main"]
